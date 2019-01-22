@@ -17,6 +17,8 @@ import { humanizeVideoDuration, noop } from './Utils';
 import PLAYER_STATES, { type PlayerState } from './Constants';
 
 type Props = {
+  timeTextStyle: StyleSheet,
+  containerStyle: StyleSheet,
   toolbar: Node,
   mainColor: string,
   isLoading: boolean,
@@ -40,7 +42,7 @@ class MediaControls extends Component<Props, State> {
     isFullScreen: false,
     isLoading: false,
     mainColor: 'rgba(12, 83, 175, 0.9)',
-    onFullScreen: noop,
+    onFullScreen: null,
     onReplay: noop,
     onSeeking: noop,
   };
@@ -177,6 +179,7 @@ class MediaControls extends Component<Props, State> {
       isLoading,
       mainColor,
       onFullScreen,
+      timeTextStyle,
       playerState,
       progress,
       toolbar,
@@ -198,10 +201,10 @@ class MediaControls extends Component<Props, State> {
         <View style={[styles.controlsRow, styles.progressContainer]}>
           <View style={styles.progressColumnContainer}>
             <View style={[styles.timerLabelsContainer]}>
-              <Text style={styles.timerLabel}>
+              <Text style={[styles.timerLabel, timeTextStyle]}>
                 {humanizeVideoDuration(progress)}
               </Text>
-              <Text style={styles.timerLabel}>
+              <Text style={[styles.timerLabel, timeTextStyle]}>
                 {humanizeVideoDuration(duration)}
               </Text>
             </View>
@@ -216,12 +219,14 @@ class MediaControls extends Component<Props, State> {
               minimumTrackTintColor={mainColor}
             />
           </View>
-          <TouchableOpacity
-            style={styles.fullScreenContainer}
-            onPress={onFullScreen}
-          >
-            <Image source={fullScreenImage} />
-          </TouchableOpacity>
+          {onFullScreen && (
+            <TouchableOpacity
+              style={styles.fullScreenContainer}
+              onPress={onFullScreen}
+            >
+              <Image source={fullScreenImage} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );
@@ -231,7 +236,11 @@ class MediaControls extends Component<Props, State> {
     return (
       <TouchableWithoutFeedback onPress={this.toggleControls}>
         <Animated.View
-          style={[styles.container, { opacity: this.state.opacity }]}
+          style={[
+            styles.container,
+            { opacity: this.state.opacity },
+            this.props.containerStyle,
+          ]}
         >
           {this.renderControls()}
         </Animated.View>
